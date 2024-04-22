@@ -1,0 +1,8 @@
+[workspace]
+members = [
+    "pcap_core",
+    "pcap_cli",
+    "pcap_wasm",
+    "pcap_tui",
+]
+resolver = "2"

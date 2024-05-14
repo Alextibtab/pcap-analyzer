@@ -70,7 +70,7 @@ fn sort_hashmap(map: &HashMap<String, u32>) -> Vec<(String, u32)> {
 fn print_table(title: &str, data: &Vec<(String, u32)>) {
     let mut table = Table::new();
     table.set_titles(Row::new(vec![
-        Cell::new("IP Address").with_style(Attr::Bold),
+        Cell::new(title).with_style(Attr::Bold),
         Cell::new("Count").with_style(Attr::Bold),
     ]));
 
@@ -78,6 +78,5 @@ fn print_table(title: &str, data: &Vec<(String, u32)>) {
         table.add_row(Row::new(vec![Cell::new(ip), Cell::new(&count.to_string())]));
     }
 
-    println!("{}", title);
     table.printstd();
 }

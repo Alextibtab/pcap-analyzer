@@ -13,6 +13,8 @@ use pnet::packet::{
 use sha1::{Digest, Sha1};
 use sha2::Sha256;
 
+use crate::utils::{get_tcp_service, get_udp_service, update_map};
+
 pub struct PcapAnalysis {
     pub ip_counts: HashMap<String, u32>,
     pub layer_4_counts: HashMap<String, u32>,
@@ -151,35 +153,29 @@ impl PcapAnalysis {
     fn parse_ipv4(&mut self, data: &[u8]) {
         if let Some(ip) = Ipv4Packet::new(data) {
             // Update IP counts
-            self.ip_counts
-                .entry(ip.get_source().to_string())
-                .and_modify(|e| *e += 1)
-                .or_insert(1);
-            self.ip_counts
-                .entry(ip.get_destination().to_string())
-                .and_modify(|e| *e += 1)
-                .or_insert(1);
+            update_map(&mut self.ip_counts, ip.get_source().to_string());
+            update_map(&mut self.ip_counts, ip.get_destination().to_string());
             match ip.get_next_level_protocol() {
                 // Update layer 4 counts
                 IpNextHeaderProtocols::Tcp => {
-                    self.layer_4_counts
-                        .entry(ip.get_next_level_protocol().to_string())
-                        .and_modify(|e| *e += 1)
-                        .or_insert(1);
+                    update_map(
+                        &mut self.layer_4_counts,
+                        ip.get_next_level_protocol().to_string(),
+                    );
                     self.analyze_tcp(ip.payload());
                 }
                 IpNextHeaderProtocols::Udp => {
-                    self.layer_4_counts
-                        .entry(ip.get_next_level_protocol().to_string())
-                        .and_modify(|e| *e += 1)
-                        .or_insert(1);
+                    update_map(
+                        &mut self.layer_4_counts,
+                        ip.get_next_level_protocol().to_string(),
+                    );
                     self.analyze_udp(ip.payload());
                 }
                 _ => {
-                    self.layer_4_counts
-                        .entry(ip.get_next_level_protocol().to_string())
-                        .and_modify(|e| *e += 1)
-                        .or_insert(1);
+                    update_map(
+                        &mut self.layer_4_counts,
+                        ip.get_next_level_protocol().to_string(),
+                    );
                 }
             }
         }
@@ -188,34 +184,19 @@ impl PcapAnalysis {
     fn parse_ipv6(&mut self, data: &[u8]) {
         if let Some(ip) = Ipv6Packet::new(data) {
             // Update IP counts
-            self.ip_counts
-                .entry(ip.get_source().to_string())
-                .and_modify(|e| *e += 1)
-                .or_insert(1);
-            self.ip_counts
-                .entry(ip.get_destination().to_string())
-                .and_modify(|e| *e += 1)
-                .or_insert(1);
+            update_map(&mut self.ip_counts, ip.get_source().to_string());
+            update_map(&mut self.ip_counts, ip.get_destination().to_string());
             match ip.get_next_header() {
                 IpNextHeaderProtocols::Tcp => {
-                    self.layer_4_counts
-                        .entry(ip.get_next_header().to_string())
-                        .and_modify(|e| *e += 1)
-                        .or_insert(1);
+                    update_map(&mut self.layer_4_counts, ip.get_next_header().to_string());
                     self.analyze_tcp(ip.payload());
                 }
                 IpNextHeaderProtocols::Udp => {
-                    self.layer_4_counts
-                        .entry(ip.get_next_header().to_string())
-                        .and_modify(|e| *e += 1)
-                        .or_insert(1);
+                    update_map(&mut self.layer_4_counts, ip.get_next_header().to_string());
                     self.analyze_udp(ip.payload());
                 }
                 _ => {
-                    self.layer_4_counts
-                        .entry(ip.get_next_header().to_string())
-                        .and_modify(|e| *e += 1)
-                        .or_insert(1);
+                    update_map(&mut self.layer_4_counts, ip.get_next_header().to_string());
                 }
             }
         }
@@ -225,16 +206,16 @@ impl PcapAnalysis {
         if let Some(tcp) = TcpPacket::new(data) {
             // Update protocol counts
             if tcp.get_source() < 2048 {
-                self.protocol_counts
-                    .entry(tcp.get_source().to_string())
-                    .and_modify(|e| *e += 1)
-                    .or_insert(1);
+                update_map(
+                    &mut self.protocol_counts,
+                    get_tcp_service(tcp.get_source()).to_string(),
+                );
             }
             if tcp.get_destination() < 2048 {
-                self.protocol_counts
-                    .entry(tcp.get_destination().to_string())
-                    .and_modify(|e| *e += 1)
-                    .or_insert(1);
+                update_map(
+                    &mut self.protocol_counts,
+                    get_tcp_service(tcp.get_destination()).to_string(),
+                );
             }
         }
     }
@@ -243,16 +224,16 @@ impl PcapAnalysis {
         if let Some(udp) = UdpPacket::new(data) {
             // Update protocol counts
             if udp.get_source() < 2048 {
-                self.protocol_counts
-                    .entry(udp.get_source().to_string())
-                    .and_modify(|e| *e += 1)
-                    .or_insert(1);
+                update_map(
+                    &mut self.protocol_counts,
+                    get_udp_service(udp.get_source()).to_string(),
+                );
             }
             if udp.get_destination() < 2048 {
-                self.protocol_counts
-                    .entry(udp.get_destination().to_string())
-                    .and_modify(|e| *e += 1)
-                    .or_insert(1);
+                update_map(
+                    &mut self.protocol_counts,
+                    get_udp_service(udp.get_destination()).to_string(),
+                );
             }
         }
     }

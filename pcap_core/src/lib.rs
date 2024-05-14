@@ -1,4 +1,5 @@
 pub mod pcap_analysis;
+pub mod utils;
 
 use pcap_analysis::{PcapAnalysis, PcapAnalysisResult, PcapError};
 

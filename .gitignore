@@ -4,3 +4,5 @@
 *.dot
 *.grc
 .*.swp
+node_modules
+_fresh

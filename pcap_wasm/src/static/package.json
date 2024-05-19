@@ -1,0 +1,14 @@
+{
+  "name": "pcap_wasm",
+  "version": "0.1.0",
+  "files": [
+    "pcap_wasm_bg.wasm",
+    "pcap_wasm.js",
+    "pcap_wasm.d.ts"
+  ],
+  "module": "pcap_wasm.js",
+  "types": "pcap_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}

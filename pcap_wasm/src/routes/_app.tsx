@@ -1,5 +1,7 @@
-import { type PageProps } from "$fresh/server.ts";
-export default function App({ Component }: PageProps) {
+import "preact/debug";
+import { PageProps } from "$fresh/server.ts";
+
+const App = ({ Component }: PageProps) => {
   return (
     <html lang="en" class="dark">
       <head>
@@ -14,4 +16,6 @@ export default function App({ Component }: PageProps) {
       </body>
     </html>
   );
-}
+};
+
+export default App;

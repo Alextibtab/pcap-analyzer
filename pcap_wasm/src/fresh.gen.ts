@@ -5,12 +5,13 @@
 import * as $_404 from "./routes/_404.tsx";
 import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
-import * as $Counter from "./islands/Counter.tsx";
 import * as $FileUploadContext from "./islands/FileUploadContext.tsx";
-import * as $Graph from "./islands/Graph.tsx";
-import * as $GraphTest from "./islands/GraphTest.tsx";
+import * as $Graph_Graph from "./islands/Graph/Graph.tsx";
+import * as $Graph_SidePanel from "./islands/Graph/SidePanel.tsx";
+import * as $Graph_ToolBar from "./islands/Graph/ToolBar.tsx";
 import * as $Results from "./islands/Results.tsx";
 import * as $UploadForm from "./islands/UploadForm.tsx";
+import * as $ViewSwitcher from "./islands/ViewSwitcher.tsx";
 import { type Manifest } from "$fresh/server.ts";
 
 const manifest = {
@@ -20,12 +21,13 @@ const manifest = {
     "./routes/index.tsx": $index,
   },
   islands: {
-    "./islands/Counter.tsx": $Counter,
     "./islands/FileUploadContext.tsx": $FileUploadContext,
-    "./islands/Graph.tsx": $Graph,
-    "./islands/GraphTest.tsx": $GraphTest,
+    "./islands/Graph/Graph.tsx": $Graph_Graph,
+    "./islands/Graph/SidePanel.tsx": $Graph_SidePanel,
+    "./islands/Graph/ToolBar.tsx": $Graph_ToolBar,
     "./islands/Results.tsx": $Results,
     "./islands/UploadForm.tsx": $UploadForm,
+    "./islands/ViewSwitcher.tsx": $ViewSwitcher,
   },
   baseUrl: import.meta.url,
 } satisfies Manifest;

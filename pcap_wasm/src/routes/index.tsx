@@ -1,8 +1,8 @@
 import { FileUploadProvider } from "@/islands/FileUploadContext.tsx";
-import Results from "@/islands/Results.tsx";
 import UploadForm from "@/islands/UploadForm.tsx";
+import ViewSwitcher from "@/islands/ViewSwitcher.tsx";
 
-export default function Home() {
+const Home = () => {
   return (
     <FileUploadProvider>
       <div class="min-h-screen flex flex-col bg-gray-900 text-white font-mono p-4">
@@ -12,9 +12,11 @@ export default function Home() {
         </div>
         <div class="content flex flex-col items-center space-y-8 w-full p-4">
           <UploadForm />
-          <Results />
+          <ViewSwitcher />
         </div>
       </div>
     </FileUploadProvider>
   );
-}
+};
+
+export default Home;

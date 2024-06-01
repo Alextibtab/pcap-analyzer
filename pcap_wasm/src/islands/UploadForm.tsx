@@ -1,10 +1,10 @@
-import { useFileUpload } from "./FileUploadContext.tsx";
+import useFileUpload from "@/islands/FileUploadContext.tsx";
 
-export default function UploadForm() {
+const UploadForm = () => {
   const { handleFileChange, analyzeFile } = useFileUpload();
 
   return (
-    <div class="upload-form flex w-full max-w-lg mb-8 space-x-4">
+    <div class="upload-form flex items-center justify-between w-full max-w-lg mb-8 space-x-4">
       <label class="block flex-grow">
         <span class="sr-only">Choose File</span>
         <input 
@@ -21,4 +21,6 @@ export default function UploadForm() {
       </button>
     </div>
   );
-}
+};
+
+export default UploadForm;

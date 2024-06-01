@@ -1,7 +1,8 @@
 import { createContext } from "preact";
 import { useContext, useReducer } from "preact/hooks";
-import { analyze_pcap_data, instantiate } from "@/lib/pcap_wasm.generated.js";
 import { asset } from "$fresh/runtime.ts";
+
+import { analyze_pcap_data, instantiate } from "@/lib/pcap_wasm.generated.js";
 
 type State = {
   file: File | null;
@@ -23,7 +24,7 @@ const FileUploadContext = createContext<
   FileUploadContextType | undefined
 >(undefined);
 
-function reducer(state: State, action: Action): State {
+const reducer = (state: State, action: Action): State => {
   console.log("Dispatching action:", action);
   switch (action.type) {
     case "SET_FILE":
@@ -33,11 +34,11 @@ function reducer(state: State, action: Action): State {
     default:
       return state;
   }
-}
+};
 
-export function FileUploadProvider(
+const FileUploadProvider = (
   { children }: { children: preact.ComponentChildren },
-) {
+) => {
   const [state, dispatch] = useReducer(reducer, { file: null, analysisResult: null });
 
   const handleFileChange = (event: Event) => {
@@ -72,13 +73,15 @@ export function FileUploadProvider(
       {children}
     </FileUploadContext.Provider>
   );
-}
+};
 
-export function useFileUpload() {
+const useFileUpload = () => {
   const context = useContext(FileUploadContext);
   if (!context) {
     throw new Error("useFileUpload must be used within a FileUploadProvider");
   }
   return context;
-}
-  
+};
+
+export { FileUploadProvider }; 
+export default useFileUpload;

@@ -1,6 +1,7 @@
-import { useFileUpload } from "@/islands/FileUploadContext.tsx";
 import { useEffect, useState } from "preact/hooks";
-import NetworkGraph from "@/islands/GraphTest.tsx";
+
+import useFileUpload from "@/islands/FileUploadContext.tsx";
+import { Connection } from "@/utils/types.ts";
 
 const sortMapByValue = (map: Map<string, number>): [string, number][] => {
   return Array.from(map.entries()).sort((a, b) => b[1] - a[1]);
@@ -20,7 +21,7 @@ const renderTable = (title: string, data: Map<string, number>) => {
             </tr>
           </thead>
           <tbody>
-            {sortedData.map(([key, count], index) => (
+            {sortedData.map(([key, count], _) => (
               <tr key={key}>
                 <td class="border px-4 py-2">{key}</td>
                 <td class="border px-4 py-2">{count}</td>
@@ -32,12 +33,6 @@ const renderTable = (title: string, data: Map<string, number>) => {
     </div>
   );
 };
-
-interface Connection {
-  src_ip: string;
-  dst_ip: string;
-  count: number;
-}
 
 const renderConnectionsTable = (title: string, data: Connection[]) => {
   const sortedData = data.sort((a, b) => b.count - a.count);
@@ -54,7 +49,7 @@ const renderConnectionsTable = (title: string, data: Connection[]) => {
             </tr>
           </thead>
           <tbody>
-            {sortedData.map((connection, index) => (
+            {sortedData.map((connection, _) => (
               <tr key={`${connection.src_ip}-${connection.dst_ip}`}>
                 <td class="border px-4 py-2">{connection.src_ip}</td>
                 <td class="border px-4 py-2">{connection.dst_ip}</td>
@@ -68,7 +63,7 @@ const renderConnectionsTable = (title: string, data: Connection[]) => {
   );
 };
 
-export default function Results() {
+const Results = () => {
   const { state } = useFileUpload();
   const [visible, setVisible] = useState(false);
 
@@ -86,11 +81,12 @@ export default function Results() {
           {renderTable("Layer 4 Protocol Counts", state.analysisResult.layer_4_counts)}
           {renderTable("Protocol Counts", state.analysisResult.protocol_counts)}
           {renderConnectionsTable("Connections", state.analysisResult.connections)}
-          <NetworkGraph connections={state.analysisResult.connections} />
         </>
       ) : (
         <p>No results yet</p>
       )}
     </div>
   );
-}
+};
+
+export default Results;

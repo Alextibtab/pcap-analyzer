@@ -1,6 +1,6 @@
 import { createContext } from "preact";
 import { useContext, useReducer } from "preact/hooks";
-import { analyze_pcap_data, instantiate } from "@/lib/rs_lib.generated.js";
+import { analyze_pcap_data, instantiate } from "@/lib/pcap_wasm.generated.js";
 import { asset } from "$fresh/runtime.ts";
 
 type State = {
@@ -58,7 +58,7 @@ export function FileUploadProvider(
     reader.onload = async (e) => {
       const contents = e.target?.result;
       if (contents instanceof ArrayBuffer) {
-        const url = new URL(asset("/rs_lib_bg.wasm"), "http://localhost:3000");
+        const url = new URL(asset("/pcap_wasm_bg.wasm"), "http://localhost:3000");
         await instantiate({url: url});
         const result = analyze_pcap_data(new Uint8Array(contents));
         dispatch({ type: "SET_ANALYSIS_RESULT", payload: result });

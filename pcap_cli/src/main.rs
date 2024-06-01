@@ -4,7 +4,7 @@ use std::path::{Path, PathBuf};
 
 use clap::Parser;
 use pcap_core::analyze_pcap;
-use pcap_core::pcap_analysis::PcapAnalysisResult;
+use pcap_core::pcap_analysis::{Connection, PcapAnalysisResult};
 use prettytable::{Attr, Cell, Row, Table};
 
 /// Analyzes PCAP files
@@ -56,6 +56,9 @@ fn print_results(results: &PcapAnalysisResult) {
     let sorted_layer7_protocols = sort_hashmap(&results.protocol_counts);
     print_table("Layer 7 Protocols", &sorted_layer7_protocols);
 
+    let connections = sort_connections(&results.connections);
+    print_connections(&connections);
+
     // Print SHA hashes
     println!("\nSHA1 Hash: {}", results.sha1);
     println!("SHA256 Hash: {}", results.sha256);
@@ -76,6 +79,31 @@ fn print_table(title: &str, data: &Vec<(String, u32)>) {
 
     for (ip, count) in data {
         table.add_row(Row::new(vec![Cell::new(ip), Cell::new(&count.to_string())]));
+    }
+
+    table.printstd();
+}
+
+fn sort_connections(connections: &Vec<Connection>) -> Vec<Connection> {
+    let mut sorted_connections = connections.clone();
+    sorted_connections.sort_unstable_by(| a, b | b.count.cmp(&a.count));
+    sorted_connections
+}
+
+fn print_connections(connections: &Vec<Connection>) {
+    let mut table = Table::new();
+    table.set_titles(Row::new(vec![
+        Cell::new("Source IP").with_style(Attr::Bold),
+        Cell::new("Dest IP").with_style(Attr::Bold),
+        Cell::new("Count").with_style(Attr::Bold),
+    ]));
+
+    for connection in connections {
+        table.add_row(Row::new(vec![
+            Cell::new(&connection.src_ip),
+            Cell::new(&connection.dst_ip),
+            Cell::new(&connection.count.to_string()),
+        ]));
     }
 
     table.printstd();

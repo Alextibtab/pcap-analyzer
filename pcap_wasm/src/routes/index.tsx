@@ -1,6 +1,6 @@
-import { FileUploadProvider } from "../islands/FileUploadContext.tsx";
+import { FileUploadProvider } from "@/islands/FileUploadContext.tsx";
 import Results from "@/islands/Results.tsx";
-import UploadForm from "../islands/UploadForm.tsx";
+import UploadForm from "@/islands/UploadForm.tsx";
 
 export default function Home() {
   return (

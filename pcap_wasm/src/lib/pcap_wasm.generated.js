@@ -2,33 +2,11 @@
 // @ts-nocheck: generated
 // deno-lint-ignore-file
 // deno-fmt-ignore-file
-/// <reference types="./rs_lib.generated.d.ts" />
+/// <reference types="./pcap_wasm.generated.d.ts" />
 
-// source-hash: bd6adafe06dba53bb4ad1e931e6aeabdad0ae671
+// source-hash: 914b0f05736c5b42c92e6147f52f8db1be85b961
 let wasm;
 let cachedInt32Memory0;
-
-const heap = new Array(128).fill(undefined);
-
-heap.push(undefined, null, true, false);
-
-function getObject(idx) {
-  return heap[idx];
-}
-
-let heap_next = heap.length;
-
-function dropObject(idx) {
-  if (idx < 132) return;
-  heap[idx] = heap_next;
-  heap_next = idx;
-}
-
-function takeObject(idx) {
-  const ret = getObject(idx);
-  dropObject(idx);
-  return ret;
-}
 
 const cachedTextDecoder = typeof TextDecoder !== "undefined"
   ? new TextDecoder("utf-8", { ignoreBOM: true, fatal: true })
@@ -54,6 +32,12 @@ function getStringFromWasm0(ptr, len) {
   return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
 }
 
+const heap = new Array(128).fill(undefined);
+
+heap.push(undefined, null, true, false);
+
+let heap_next = heap.length;
+
 function addHeapObject(obj) {
   if (heap_next === heap.length) heap.push(heap.length + 1);
   const idx = heap_next;
@@ -61,6 +45,22 @@ function addHeapObject(obj) {
 
   heap[idx] = obj;
   return idx;
+}
+
+function getObject(idx) {
+  return heap[idx];
+}
+
+function dropObject(idx) {
+  if (idx < 132) return;
+  heap[idx] = heap_next;
+  heap_next = idx;
+}
+
+function takeObject(idx) {
+  const ret = getObject(idx);
+  dropObject(idx);
+  return ret;
 }
 
 let WASM_VECTOR_LEN = 0;
@@ -84,16 +84,16 @@ export function analyze_pcap_data(data) {
 
 const imports = {
   __wbindgen_placeholder__: {
+    __wbindgen_error_new: function (arg0, arg1) {
+      const ret = new Error(getStringFromWasm0(arg0, arg1));
+      return addHeapObject(ret);
+    },
     __wbindgen_object_drop_ref: function (arg0) {
       takeObject(arg0);
     },
     __wbindgen_is_string: function (arg0) {
       const ret = typeof (getObject(arg0)) === "string";
       return ret;
-    },
-    __wbindgen_error_new: function (arg0, arg1) {
-      const ret = new Error(getStringFromWasm0(arg0, arg1));
-      return addHeapObject(ret);
     },
     __wbindgen_number_new: function (arg0) {
       const ret = arg0;
@@ -110,6 +110,10 @@ const imports = {
       const ret = getObject(arg0);
       return addHeapObject(ret);
     },
+    __wbg_new_16b304a2cfa7ff4a: function () {
+      const ret = new Array();
+      return addHeapObject(ret);
+    },
     __wbg_new_d9bc3a0147634640: function () {
       const ret = new Map();
       return addHeapObject(ret);
@@ -117,6 +121,9 @@ const imports = {
     __wbg_new_72fb9a18b5ae2624: function () {
       const ret = new Object();
       return addHeapObject(ret);
+    },
+    __wbg_set_d4638f722068f043: function (arg0, arg1, arg2) {
+      getObject(arg0)[arg1 >>> 0] = takeObject(arg2);
     },
     __wbg_set_8417257aaedc936b: function (arg0, arg1, arg2) {
       const ret = getObject(arg0).set(getObject(arg1), getObject(arg2));
@@ -243,7 +250,7 @@ export async function instantiate(opts) {
 
 export async function instantiateWithInstance(opts) {
   const { instance } = await loader.load(
-    opts?.url ?? new URL("rs_lib_bg.wasm", import.meta.url),
+    opts?.url ?? new URL("pcap_wasm_bg.wasm", import.meta.url),
     opts?.decompress,
   );
   wasm = wasm ?? instance.exports;

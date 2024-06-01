@@ -7,6 +7,8 @@ import * as $_app from "./routes/_app.tsx";
 import * as $index from "./routes/index.tsx";
 import * as $Counter from "./islands/Counter.tsx";
 import * as $FileUploadContext from "./islands/FileUploadContext.tsx";
+import * as $Graph from "./islands/Graph.tsx";
+import * as $GraphTest from "./islands/GraphTest.tsx";
 import * as $Results from "./islands/Results.tsx";
 import * as $UploadForm from "./islands/UploadForm.tsx";
 import { type Manifest } from "$fresh/server.ts";
@@ -20,6 +22,8 @@ const manifest = {
   islands: {
     "./islands/Counter.tsx": $Counter,
     "./islands/FileUploadContext.tsx": $FileUploadContext,
+    "./islands/Graph.tsx": $Graph,
+    "./islands/GraphTest.tsx": $GraphTest,
     "./islands/Results.tsx": $Results,
     "./islands/UploadForm.tsx": $UploadForm,
   },

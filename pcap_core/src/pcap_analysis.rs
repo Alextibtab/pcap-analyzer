@@ -15,10 +15,18 @@ use sha2::Sha256;
 
 use crate::utils::{get_tcp_service, get_udp_service, update_map};
 
+#[derive(Clone)]
+pub struct Connection {
+    pub src_ip: String,
+    pub dst_ip: String,
+    pub count: u32,
+}
+
 pub struct PcapAnalysis {
     pub ip_counts: HashMap<String, u32>,
     pub layer_4_counts: HashMap<String, u32>,
     pub protocol_counts: HashMap<String, u32>,
+    pub connections: HashMap<(String, String), Connection>,
     pub sni_stats: HashMap<String, u32>,
     pub http_hostnames: HashMap<String, u32>,
     pub user_agents: HashMap<String, u32>,
@@ -37,6 +45,7 @@ pub struct PcapAnalysisResult {
     pub ip_counts: HashMap<String, u32>,
     pub layer_4_counts: HashMap<String, u32>,
     pub protocol_counts: HashMap<String, u32>,
+    pub connections: Vec<Connection>,
     pub sni_stats: HashMap<String, u32>,
     pub http_hostnames: HashMap<String, u32>,
     pub user_agents: HashMap<String, u32>,
@@ -51,6 +60,7 @@ impl PcapAnalysis {
             ip_counts: HashMap::new(),
             layer_4_counts: HashMap::new(),
             protocol_counts: HashMap::new(),
+            connections: HashMap::new(),
             sni_stats: HashMap::new(),
             http_hostnames: HashMap::new(),
             user_agents: HashMap::new(),
@@ -70,10 +80,13 @@ impl PcapAnalysis {
 
         self.analyze(data);
 
+        let connections = self.connections.values().cloned().collect();
+        
         Ok(PcapAnalysisResult {
             ip_counts: self.ip_counts.clone(),
             layer_4_counts: self.layer_4_counts.clone(),
             protocol_counts: self.protocol_counts.clone(),
+            connections,
             sni_stats: self.sni_stats.clone(),
             http_hostnames: self.http_hostnames.clone(),
             user_agents: self.user_agents.clone(),
@@ -155,6 +168,24 @@ impl PcapAnalysis {
             // Update IP counts
             update_map(&mut self.ip_counts, ip.get_source().to_string());
             update_map(&mut self.ip_counts, ip.get_destination().to_string());
+        
+            let (src_ip, dst_ip) = if ip.get_source() < ip.get_destination() {
+                (ip.get_source().to_string(), ip.get_destination().to_string())
+            } else {
+                (ip.get_destination().to_string(), ip.get_destination().to_string())
+            };
+
+            if src_ip != dst_ip {
+                let connection_key = (src_ip.clone(), dst_ip.clone()); 
+
+                let connection = self.connections.entry(connection_key).or_insert(Connection {
+                    src_ip: src_ip.clone(),
+                    dst_ip: dst_ip.clone(),
+                    count: 0,
+                });
+                connection.count += 1;
+            }
+
             match ip.get_next_level_protocol() {
                 // Update layer 4 counts
                 IpNextHeaderProtocols::Tcp => {

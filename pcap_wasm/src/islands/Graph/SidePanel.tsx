@@ -1,6 +1,6 @@
 const SidePanel = ({ selectedNode, selectedLink }) => {
   return (
-    <div class="w-1/4 p-4 bg-gray-800 text-white rounded">
+    <div class="p-4 h-full border-2 border-gray-600 text-white rounded">
       {selectedNode ? (
         <div>
           <h2 class="text-xl font-bold">Node Details</h2>

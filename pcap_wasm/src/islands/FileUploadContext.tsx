@@ -7,30 +7,26 @@ import { analyze_pcap_data, instantiate } from "@/lib/pcap_wasm.generated.js";
 type State = {
   file: File | null;
   analysisResult: any | null;
+  loading: boolean;
 };
 
 type Action = 
   | { type: "SET_FILE"; payload: File }
-  | { type: "SET_ANALYSIS_RESULT"; payload: any }; 
-
-type FileUploadContextType = {
-  state: State,
-  dispatch: (action: Action) => void;
-  handleFileChange: (event: Event) => void;
-  analyzeFile: () => void;
-}
+  | { type: "SET_ANALYSIS_RESULT"; payload: any }
+  | { type: "SET_LOADING"; payload: boolean };
 
 const FileUploadContext = createContext<
-  FileUploadContextType | undefined
+  { state: State; dispatch: (action: Action) => void; analyseFile: (file: File) => Promise<void>} | undefined
 >(undefined);
 
 const reducer = (state: State, action: Action): State => {
-  console.log("Dispatching action:", action);
   switch (action.type) {
     case "SET_FILE":
       return { ...state, file: action.payload };
     case "SET_ANALYSIS_RESULT":
       return { ...state, analysisResult: action.payload };
+    case "SET_LOADING":
+      return { ...state, loading: action.payload };
     default:
       return state;
   }
@@ -39,37 +35,28 @@ const reducer = (state: State, action: Action): State => {
 const FileUploadProvider = (
   { children }: { children: preact.ComponentChildren },
 ) => {
-  const [state, dispatch] = useReducer(reducer, { file: null, analysisResult: null });
+  const [state, dispatch] = useReducer(reducer, { file: null, analysisResult: null, loading: false });
 
-  const handleFileChange = (event: Event) => {
-    const target = event.target as HTMLInputElement;
-    const file = target.files?.[0];
-    if (file) {
-      dispatch({ type: "SET_FILE", payload: file });
-    }
-  };
-
-  const analyzeFile = async () => {
-    if (!state.file) {
-      alert('Please select a file');
-      return;
-    }
-
+  const analyseFile = async (file: File) => {
+    dispatch({ type: "SET_LOADING", payload: true });
     const reader = new FileReader();
-    reader.onload = async (e) => {
-      const contents = e.target?.result;
-      if (contents instanceof ArrayBuffer) {
+    reader.onload = async () => {
+      try {
         const url = new URL(asset("/pcap_wasm_bg.wasm"), "http://localhost:3000");
         await instantiate({url: url});
-        const result = analyze_pcap_data(new Uint8Array(contents));
+        const result = analyze_pcap_data(new Uint8Array(reader.result as ArrayBuffer));
         dispatch({ type: "SET_ANALYSIS_RESULT", payload: result });
+        dispatch({ type: "SET_LOADING", payload: false });
+      } catch (error) {
+        console.error("Failed to analyse pcap file: ", error);
+        dispatch({ type: "SET_LOADING", payload: false });
       }
     };
-    reader.readAsArrayBuffer(state.file);
+    reader.readAsArrayBuffer(file);
   };
 
   return (
-    <FileUploadContext.Provider value={{ state, dispatch, handleFileChange, analyzeFile }}>
+    <FileUploadContext.Provider value={{ state, dispatch, analyseFile }}>
       {children}
     </FileUploadContext.Provider>
   );

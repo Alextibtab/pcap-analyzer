@@ -24,11 +24,11 @@ jobs:
           deno-version: v1.x
 
       - name: Build step
-        run: "deno task start"
+        run: "cd pcap_wasm; deno task start"
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "pcap-analyzer"
           entrypoint: "pcap_wasm/src/main.ts"
-          root: "."
+          root: "pcap_wasm/"

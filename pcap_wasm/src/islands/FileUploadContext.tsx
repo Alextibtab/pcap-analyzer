@@ -42,7 +42,7 @@ const FileUploadProvider = (
     const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const wasm_url = new URL(asset("/pcap_wasm_bg.wasm"), url.hostname);
+        const wasm_url = new URL(asset("/pcap_wasm_bg.wasm"), 'https://pcap-analyzer.deno.dev/');
         await instantiate({url: wasm_url});
         const result = analyze_pcap_data(new Uint8Array(reader.result as ArrayBuffer));
         dispatch({ type: "SET_ANALYSIS_RESULT", payload: result });

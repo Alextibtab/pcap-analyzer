@@ -42,8 +42,8 @@ const FileUploadProvider = (
     const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const url = new URL(asset("/pcap_wasm_bg.wasm"), "http://localhost:3000");
-        await instantiate({url: url});
+        const url = new URL(asset("/pcap_wasm_bg.wasm"), window.location.href);
+        await instantiate({url: url.toString()});
         const result = analyze_pcap_data(new Uint8Array(reader.result as ArrayBuffer));
         dispatch({ type: "SET_ANALYSIS_RESULT", payload: result });
         dispatch({ type: "SET_LOADING", payload: false });

@@ -31,4 +31,4 @@ jobs:
         with:
           project: "pcap-analyzer"
           entrypoint: "pcap_wasm/src/main.ts"
-          root: "pcap_wasm/"
+          root: "."
